@@ -14,7 +14,7 @@ RUN pip install -r requirements.txt
 COPY . /app
 
 RUN chmod ugo+rwx /app/temp/
-RUN chmod ugo+rwx /app/sql/
+RUN chmod -R ugo+rwx /app/sql/
 
 RUN ls -lrt /app/temp/
 
