@@ -14,8 +14,10 @@ RUN pip install -r requirements.txt
 COPY . /app
 
 RUN chmod ugo+rwx /app/temp/
+RUN chmod ugo+rwx /app/sql/
 
 RUN ls -lrt /app/temp/
+
 
 # configure the container to run in an executed manner
 ENTRYPOINT [ "python" ]
