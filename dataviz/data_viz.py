@@ -91,7 +91,7 @@ def generate_charts(sql_file_list):
     for i in sql_file_list:
         viz_func = '_' + i.replace('-', '_').split('.')[0]
         if viz_func in l_functions:
-            created_file.append(eval(viz_func)(fetch_data.fetch_data(i.split('.')[0])))
+            created_file.append(eval(viz_func)(fetch_data.fetch_data(i.split('.')[0], sql_limit=None)))
             # created_file.append(_accnt(fetch_data.fetch_data(i.split('.')[0])))
     not_aFile = False
     if len(created_file) > 1:
