@@ -2,7 +2,7 @@ import psycopg2
 from config import config
 
 # Connect ot DB and fetch result set by executing query on DB
-def execute_sql(query):
+def execute_sql(query, sql_limit):
     try:
         conn = psycopg2.connect(**config.config)
     except psycopg2.OperationalError as e:
@@ -13,7 +13,10 @@ def execute_sql(query):
         try:
             cur.execute(query)
             cols = [desc[0] for desc in cur.description]
-            rows = cur.fetchall()
+            if sql_limit is None:
+                rows = cur.fetchall()
+            else:
+                rows = cur.fetchmany(sql_limit)
             return cols, rows
         except Exception as e:
             print(e)
@@ -25,11 +28,11 @@ def execute_sql(query):
         return "ConnError"
 
 
-def fetch_resulset(query):
+def fetch_resulset(query, sql_limit):
     failed_flag = 'failed'
-    if execute_sql(query) == 'SQLError':
+    if execute_sql(query, sql_limit) == 'SQLError':
         return failed_flag, "Could not fetch Results. Failed to execute SQL. Check SQL statement"
-    if execute_sql(query) == 'ConnError':
+    if execute_sql(query, sql_limit) == 'ConnError':
         return failed_flag, "Failed to connect to Database. Check connection details."
-    return execute_sql(query)
+    return execute_sql(query, sql_limit)
 
