@@ -19,7 +19,7 @@ def fetch_data(filename, sql_limit):
             error_d = '[{"error" : "Error while fetching data"}]'
             return json.loads(error_d)
         df = pd.DataFrame(rows, columns=cols)
-        row_dict = json.dumps(json.loads(df.to_json(orient='records')))
+        row_dict = df.to_json(orient='records')
         #print(row_dict)
         return json.loads(row_dict)
     else:
