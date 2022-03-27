@@ -31,8 +31,8 @@ def execute_sql(query, sql_limit):
 def fetch_resulset(query, sql_limit):
     ret_col, ret_row = execute_sql(query, sql_limit)
     if ret_col == 'SQLError':
-        return failed_flag, "Could not fetch Results. Failed to execute SQL. Check SQL statement"
+        return ret_row, "Could not fetch Results. Failed to execute SQL. Check SQL statement"
     if ret_col == 'ConnError':
-        return failed_flag, "Failed to connect to Database. Check connection details."
+        return ret_row, "Failed to connect to Database. Check connection details."
     return  ret_col, ret_row
 
