@@ -121,10 +121,12 @@ class CustomSql(Resource):
     def post(self):
         data = request.get_json()
         sql_args = sql_parser.parse_args()
-        if sql_args['limit'] == '' or sql_args['limit'] is None:
-            custom_data = fetch_data_custom(data, None)
+        if sql_arg['limit'] and sql_arg['limit'] > 0:
+            sql_limit = ' limit ' + str(sql_arg['limit'])
         else:
-            custom_data = fetch_data_custom(data, sql_args['limit'])
+            sql_limit = ''
+            sql_filter = ' where 1 = 1'
+        custom_data = fetch_data_custom(data, sql_filter + sql_limit)
         return json.loads(custom_data)
     
 
