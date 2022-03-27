@@ -12,9 +12,40 @@ api = Api(app)
 
 sql_parser = reqparse.RequestParser()
 sql_parser.add_argument('limit', type=int, help="Limit the returned rows of SQL Query")
+sql_parser.add_argument('filter', type=str, help="filter the returned rows of SQL Query")
+sql_parser.add_argument('per_page', type=int, help="Per Page limit")
 
 # custom_sql_args = reqparse.RequestParser()
 # custom_sql_args.add_argument("sql", type=str, help="Send SQL Query", required=True)
+
+def get_paginated_list(results, url, start, per_page=10):
+    start = int(start)
+    per_page = int(per_page)
+    count = len(results)
+    if count < start or per_page < 0:
+        flask.abort(404)
+
+    obj = {}
+    obj['start'] = start
+    obj['per_page'] = per_page
+    obj['count'] = count
+
+    if start == 1:
+        obj['previous'] = ''
+    else:
+        start_copy = max(1, start - per_page)
+        per_page_copy = start - 1
+        obj['previous'] = url + '?start=%d&per_page=%d' % (start_copy, per_page_copy)
+
+    if start + per_page > count:
+        obj['next'] = ''
+    else:
+        start_copy = start + per_page
+        obj['next'] = url + '?start=%d&per_page=%d' % (start_copy, per_page)
+
+    obj['results'] = results[(start - 1):(start - 1 + per_page)]
+    return obj
+
 
 @app.route('/')
 @app.route("/home")
@@ -30,12 +61,22 @@ def list_api_page():
 @app.route("/fetch_apps/<string:tablename>", methods=['GET'])
 def fetchdata_apps(tablename):
     #tablename='accnt'
-    sql_args = sql_parser.parse_args()
-    if sql_args['limit'] == '' or sql_args['limit'] is None:
-        df = pd.DataFrame(fetch_data(tablename, None))
+    sql_arg = sql_parser.parse_args()
+    if sql_arg['filter'] is not None:
+        sql_filter = ' where ' + sql_arg['filter'] + ' '
     else:
-        df = pd.DataFrame(fetch_data(tablename, sql_args['limit']))
-    return flask.jsonify(json.loads(df.to_json(orient='records')))
+        sql_filter = ' where 1 = 1'
+    if sql_arg['limit'] and sql_arg['limit'] > 0:
+        sql_limit = ' limit ' + str(sql_arg['limit'])
+    else:
+        sql_limit = ''
+        sql_arg['per_page'] = 10
+    df = pd.DataFrame(fetch_data(tablename, sql_filter + sql_limit))
+    return flask.jsonify(get_paginated_list(
+        json.loads(df.to_json(orient='records')),
+        request.url_root + '/fetch_apps/' + tablename,
+        start=request.args.get('start', 1),
+        per_page=request.args.get('per_page', sql_arg['per_page'])))
 
 
 class FetchApp(Resource):
@@ -83,6 +124,7 @@ class CustomSql(Resource):
         else:
             custom_data = fetch_data_custom(data, sql_args['limit'])
         return json.loads(custom_data)
+    
 
 
 api.add_resource(FetchApp, '/fetch_apps')
