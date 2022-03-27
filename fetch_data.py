@@ -3,7 +3,7 @@ import pandas as pd
 from utils.connect_db import fetch_resulset
 
 #Fetch data based on sql files palced in sql folder
-def fetch_data(filename, sql_limit):
+def fetch_data(filename, sql_args):
     #print(filename)
     row_dict = '[{"data": "Not Found"}]'
     directory = './sql'
@@ -14,7 +14,7 @@ def fetch_data(filename, sql_limit):
             query = sq.read().replace('\n', ' ')
         #query = query+" and super_region='APAC' LIMIT 10"
         #print(query)
-        cols, rows = fetch_resulset(query, sql_limit)
+        cols, rows = fetch_resulset(query, sql_args)
         if cols == 'failed':
             error_d = '[{"error" : "Error while fetching data"}]'
             return json.loads(error_d)
@@ -27,9 +27,9 @@ def fetch_data(filename, sql_limit):
 
 
 #fetch custom sql data
-def fetch_data_custom(data, sql_limit):
+def fetch_data_custom(data, sql_args):
     query = data[list(data)[0]]
-    cols, rows = fetch_resulset(query, sql_limit)
+    cols, rows = fetch_resulset(query, sql_args)
     if cols == 'failed':
         error_d = '[{"error" : "Error while fetching data"}]'
         # return rows
