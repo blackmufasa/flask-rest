@@ -76,7 +76,7 @@ def fetchdata_apps(tablename):
     df = pd.DataFrame(fetch_data(tablename, sql_filter + sql_limit))
     return flask.jsonify(get_paginated_list(
         json.loads(df.to_json(orient='records')),
-        request.url_root + '/fetch_apps/' + tablename,
+        request.url_root + 'fetch_apps/' + tablename,
         start=request.args.get('start', 1),
         per_page=request.args.get('per_page', sql_arg['per_page'])))
 
