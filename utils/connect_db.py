@@ -20,19 +20,19 @@ def execute_sql(query, sql_limit):
             return cols, rows
         except Exception as e:
             print(e)
-            return "SQLError"
+            return "SQLError", "failed"
         finally:
             cur.close()
             conn.close()
     else:
-        return "ConnError"
+        return "ConnError", "failed"
 
 
 def fetch_resulset(query, sql_limit):
-    failed_flag = 'failed'
-    if execute_sql(query, sql_limit) == 'SQLError':
+    ret_col, ret_row = execute_sql(query, sql_limit)
+    if ret_col == 'SQLError':
         return failed_flag, "Could not fetch Results. Failed to execute SQL. Check SQL statement"
-    if execute_sql(query, sql_limit) == 'ConnError':
+    if ret_col == 'ConnError':
         return failed_flag, "Failed to connect to Database. Check connection details."
-    return execute_sql(query, sql_limit)
+    return  ret_col, ret_row
 
