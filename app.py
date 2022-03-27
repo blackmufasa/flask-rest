@@ -71,6 +71,8 @@ def fetchdata_apps(tablename):
     else:
         sql_limit = ''
         sql_arg['per_page'] = 10
+    if sql_arg['per_page'] is None:
+        sql_arg['per_page'] = 10
     df = pd.DataFrame(fetch_data(tablename, sql_filter + sql_limit))
     return flask.jsonify(get_paginated_list(
         json.loads(df.to_json(orient='records')),
