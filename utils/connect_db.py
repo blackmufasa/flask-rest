@@ -22,7 +22,7 @@ def execute_sql(query, sql_args):
             #cols = [desc[0] for desc in cur.description]
             #rows = cur.fetchall()
             #return cols, rows
-            table_result = create_pandas_table('Select * from ( ' + query + ' ) as AaxbxZz ' + sql_args)
+            table_result = create_pandas_table('Select * from ( ' + query + ' ) as AaxbxZz ' + sql_args, conn)
             return table_result
         
         except Exception as e:
