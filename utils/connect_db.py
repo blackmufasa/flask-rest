@@ -1,5 +1,11 @@
 import psycopg2
 from config import config
+import pandas as pd
+
+
+def create_pandas_table(sql_query, conn):
+    sql_table = pd.read_sql_query(sql_query, conn)
+    return sql_table
 
 # Connect ot DB and fetch result set by executing query on DB
 def execute_sql(query, sql_args):
