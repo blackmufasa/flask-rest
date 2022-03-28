@@ -73,7 +73,7 @@ def fetchdata_apps(tablename):
         sql_arg['per_page'] = 10
     if sql_arg['per_page'] is None:
         sql_arg['per_page'] = 10
-    df = pd.DataFrame(fetch_data(tablename, sql_filter + sql_limit))
+    df = fetch_data(tablename, sql_filter + sql_limit)
     return flask.jsonify(get_paginated_list(
         json.loads(df.to_json(orient='records')),
         request.url_root + 'fetch_apps/' + tablename,
@@ -127,7 +127,7 @@ class CustomSql(Resource):
         else:
             sql_limit = ''
             sql_filter = ' where 1 = 1'
-        df = pd.DataFrame(fetch_data_custom(data, sql_filter + sql_limit))
+        df = fetch_data_custom(data, sql_filter + sql_limit)
         obj['results'] = json.loads(df.to_json(orient='records'))
         return flask.jsonify(obj)
     
