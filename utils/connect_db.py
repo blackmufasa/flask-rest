@@ -21,19 +21,19 @@ def execute_sql(query, sql_args):
         
         except Exception as e:
             print(e)
-            return "SQLError", "failed"
+            return "SQLError"
         finally:
             cur.close()
             conn.close()
     else:
-        return "ConnError", "failed"
+        return "ConnError"
 
 
 def fetch_resulset(query, sql_args):
-    ret_col, ret_row = execute_sql(query, sql_args)
+    ret_result = execute_sql(query, sql_args)
     if ret_col == 'SQLError':
-        return ret_row, "Could not fetch Results. Failed to execute SQL. Check SQL statement"
+        return "failed", "Could not fetch Results. Failed to execute SQL. Check SQL statement"
     if ret_col == 'ConnError':
-        return ret_row, "Failed to connect to Database. Check connection details."
-    return  ret_col, ret_row
+        return "failed", "Failed to connect to Database. Check connection details."
+    return  "success", ret_result
 
