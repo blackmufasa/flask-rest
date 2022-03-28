@@ -11,11 +11,14 @@ def execute_sql(query, sql_args):
     if conn is not None:
         cur = conn.cursor()
         try:
-            cur.execute('Select * from ( ' + query + ' ) as AaZz ' + sql_args)
+            #cur.execute('Select * from ( ' + query + ' ) as AaZz ' + sql_args)
             #cur.execute(query)
-            cols = [desc[0] for desc in cur.description]
-            rows = cur.fetchall()
-            return cols, rows
+            #cols = [desc[0] for desc in cur.description]
+            #rows = cur.fetchall()
+            #return cols, rows
+            table_result = create_pandas_table('Select * from ( ' + query + ' ) as AaZz ' + sql_args)
+            return table_result
+        
         except Exception as e:
             print(e)
             return "SQLError", "failed"
