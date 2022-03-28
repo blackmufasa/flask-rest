@@ -22,7 +22,7 @@ def execute_sql(query, sql_args):
             #cols = [desc[0] for desc in cur.description]
             #rows = cur.fetchall()
             #return cols, rows
-            table_result = create_pandas_table('Select * from ( ' + query + ' ) as AaZz ' + sql_args)
+            table_result = create_pandas_table('Select * from ( ' + query + ' ) as AaxbxZz ' + sql_args)
             return table_result
         
         except Exception as e:
@@ -37,9 +37,8 @@ def execute_sql(query, sql_args):
 
 def fetch_resulset(query, sql_args):
     ret_result = execute_sql(query, sql_args)
-    if ret_col == 'SQLError':
+    if str(ret_result) == 'SQLError':
         return "failed", "Could not fetch Results. Failed to execute SQL. Check SQL statement"
-    if ret_col == 'ConnError':
+    if str(ret_result) == 'ConnError':
         return "failed", "Failed to connect to Database. Check connection details."
     return  "success", ret_result
-
