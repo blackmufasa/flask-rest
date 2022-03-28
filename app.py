@@ -119,7 +119,7 @@ class CustomSql(Resource):
     #    return custsql
 
     def post(self):
-	obj={}	  
+        obj={}
         data = request.get_json()
         sql_args = sql_parser.parse_args()
         if sql_arg['limit'] and sql_arg['limit'] > 0:
