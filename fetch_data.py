@@ -18,7 +18,7 @@ def fetch_data(filename, sql_args):
         if cols == 'failed':
             error_d = '[{"error" : "Error while fetching data"}]'
             return json.loads(error_d)
-		df = rows		 
+        df = rows
         row_dict = df.to_json(orient='records')
         #print(row_dict)
         return json.loads(row_dict)
@@ -34,6 +34,6 @@ def fetch_data_custom(data, sql_args):
     if cols == 'failed':
         error_d = '[{"error" : "Error while fetching data"}]'
         return json.loads(error_d)
-	df = rows
+    df = rows
     row_dict = df.to_json(orient='records')
     return json.loads(row_dict)
