@@ -4,8 +4,8 @@ import pandas as pd
 
 
 def create_pandas_table(sql_query, conn):
-    sql_table = pd.read_sql_query(sql_query, conn)
-    return sql_table
+    table = pd.read_sql_query(sql_query, conn)
+    return table
 
 # Connect ot DB and fetch result set by executing query on DB
 def execute_sql(query, sql_args):
@@ -22,23 +22,26 @@ def execute_sql(query, sql_args):
             #cols = [desc[0] for desc in cur.description]
             #rows = cur.fetchall()
             #return cols, rows
-            table_result = create_pandas_table('Select * from ( ' + query + ' ) as AaxbxZz ' + sql_args, conn)
-            return table_result
-        
+            table_result = create_pandas_table('Select * from ( ' + query + ' ) as AaZz ' + sql_args, conn)
+            return "success", table_result
+
         except Exception as e:
             print(e)
-            return "SQLError"
+            return "failed", "SQLError"
         finally:
             cur.close()
             conn.close()
     else:
-        return "ConnError"
+        return "failed", "ConnError"
 
 
 def fetch_resulset(query, sql_args):
-    ret_result = execute_sql(query, sql_args)
-    if str(ret_result) == 'SQLError':
-        return "failed", "Could not fetch Results. Failed to execute SQL. Check SQL statement"
-    if str(ret_result) == 'ConnError':
-        return "failed", "Failed to connect to Database. Check connection details."
-    return  "success", ret_result
+    ret_flag, ret_result = execute_sql(query, sql_args)
+    if ret_flag == 'failed':
+        if str(ret_result) == 'SQLError':
+            return "failed", "Could not fetch Results. Failed to execute SQL. Check SQL statement"
+        if str(ret_result) == 'ConnError':
+            return "failed", "Failed to connect to Database. Check connection details."
+    else:
+        return "success", ret_result
+
