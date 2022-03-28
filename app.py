@@ -122,11 +122,11 @@ class CustomSql(Resource):
         obj={}
         data = request.get_json()
         sql_arg = sql_parser.parse_args()
+        sql_filter = ' where 1 = 1'
         if sql_arg['limit'] and sql_arg['limit'] > 0:
             sql_limit = ' limit ' + str(sql_arg['limit'])
         else:
             sql_limit = ''
-            sql_filter = ' where 1 = 1'
         df = fetch_data_custom(data, sql_filter + sql_limit)
         obj['results'] = json.loads(df.to_json(orient='records'))
         return flask.jsonify(obj)
