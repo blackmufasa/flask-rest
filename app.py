@@ -1,5 +1,5 @@
 import os, json, flask
-from  flask_restful import reqparse
+from flask_restful import reqparse
 from flask import Flask, request, render_template
 from flask_restful import Resource, Api
 import pandas as pd
@@ -15,12 +15,14 @@ sql_parser.add_argument('limit', type=int, help="Limit the returned rows of SQL 
 sql_parser.add_argument('filter', type=str, help="filter the returned rows of SQL Query")
 sql_parser.add_argument('per_page', type=int, help="Per Page limit")
 
+
 # custom_sql_args = reqparse.RequestParser()
 # custom_sql_args.add_argument("sql", type=str, help="Send SQL Query", required=True)
 
-def get_paginated_list(results, url, start, per_page=10):
+def get_paginated_list(tablename, sql_args, url, start, per_page=10):
     start = int(start)
     per_page = int(per_page)
+    results = fetch_data(tablename, sql_args)
     count = len(results)
     if count < start or per_page < 0:
         flask.abort(404)
@@ -43,7 +45,7 @@ def get_paginated_list(results, url, start, per_page=10):
         start_copy = start + per_page
         obj['next'] = url + '?start=%d&per_page=%d' % (start_copy, per_page)
 
-    obj['results'] = results[(start - 1):(start - 1 + per_page)]
+    obj['results'] = json.loads(results[(start - 1):(start - 1 + per_page)][:].to_json(orient="records"))
     return obj
 
 
@@ -55,12 +57,14 @@ def home_page():
 
 @app.route("/list_api")
 def list_api_page():
-    return render_template('list_api.html', api_list_items=[fname.split('.')[0] for fname in os.listdir(config.project_sql) if os.path.isdir(fname) == False])
+    return render_template('list_api.html',
+                           api_list_items=[fname.split('.')[0] for fname in os.listdir(config.project_sql) if
+                                           os.path.isdir(fname) == False])
 
 
 @app.route("/fetch_apps/<string:tablename>", methods=['GET'])
 def fetchdata_apps(tablename):
-    #tablename='accnt'
+    # tablename='accnt'
     sql_arg = sql_parser.parse_args()
     if sql_arg['filter'] is not None:
         sql_filter = ' where ' + sql_arg['filter'] + ' '
@@ -73,9 +77,9 @@ def fetchdata_apps(tablename):
         sql_arg['per_page'] = 10
     if sql_arg['per_page'] is None:
         sql_arg['per_page'] = 10
-    df = fetch_data(tablename, sql_filter + sql_limit)
+    #df = fetch_data(tablename, sql_filter + sql_limit)
     return flask.jsonify(get_paginated_list(
-        json.loads(df.to_json(orient='records')),
+        tablename, sql_filter + sql_limit,
         request.url_root + 'fetch_apps/' + tablename,
         start=request.args.get('start', 1),
         per_page=request.args.get('per_page', sql_arg['per_page'])))
@@ -86,7 +90,7 @@ class FetchApp(Resource):
         pass
 
     def get(self):
-        #directory = config.project_sql
+        # directory = config.project_sql
         api_list = [fname.split('.')[0] for fname in os.listdir(config.project_sql) if os.path.isdir(fname) == False]
         return flask.jsonify(api_list)
 
@@ -97,10 +101,11 @@ class GetViz(Resource):
 
     def get(self):
 
-        #directory = config.project_sql
-        sql_file_list = [fname for fname in os.listdir(config.project_sql) if os.path.isdir(fname) == False and fname.endswith('.sql')]
+        # directory = config.project_sql
+        sql_file_list = [fname for fname in os.listdir(config.project_sql) if
+                         os.path.isdir(fname) == False and fname.endswith('.sql')]
         viz_file = generate_charts(sql_file_list)
-        #print(viz_file)
+        # print(viz_file)
         if '.' in viz_file:
             if viz_file.split('.')[1] == 'pdf' or viz_file.split('.')[1] == 'zip':
                 return flask.send_file(viz_file)
@@ -108,7 +113,6 @@ class GetViz(Resource):
                 return viz_file
         else:
             return viz_file
-
 
 
 class CustomSql(Resource):
@@ -127,10 +131,10 @@ class CustomSql(Resource):
             sql_limit = ' limit ' + str(sql_arg['limit'])
         else:
             sql_limit = ''
+            sql_filter = ' where 1 = 1'
         df = fetch_data_custom(data, sql_filter + sql_limit)
         obj['results'] = json.loads(df.to_json(orient='records'))
         return flask.jsonify(obj)
-    
 
 
 api.add_resource(FetchApp, '/fetch_apps')
