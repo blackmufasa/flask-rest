@@ -1,5 +1,6 @@
 import os, json
 import pandas as pd
+import flask
 from utils.connect_db import fetch_resulset
 
 #Fetch data based on sql files palced in sql folder
@@ -38,3 +39,6 @@ def fetch_data_custom(data, sql_args):
         # return rows
         return error_d
     return rows
+    #df = rows
+    #row_dict = df.to_json(orient='records')
+    #return json.loads(row_dict)
