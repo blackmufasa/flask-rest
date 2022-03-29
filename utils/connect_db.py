@@ -19,11 +19,12 @@ def execute_sql(query, sql_args):
         try:
             #cur.execute('Select * from ( ' + query + ' ) as AaZz ' + sql_args)
             #cur.execute(query)
-            #cols = [desc[0] for desc in cur.description]
-            #rows = cur.fetchall()
-            #return cols, rows
-            table_result = create_pandas_table('Select * from ( ' + query + ' ) as AaZz ' + sql_args, conn)
-            return "success", table_result
+            cols = [desc[0] for desc in cur.description]
+            rows = cur.fetchall()
+            df = pd.DataFrame(rows,columns=cols)
+            return "success", df
+            # table_result = create_pandas_table('Select * from ( ' + query + ' ) as AaZz ' + sql_args, conn)
+            # return "success", table_result
 
         except Exception as e:
             print(e)
