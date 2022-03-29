@@ -43,21 +43,22 @@ def save_viz_pdf(filename):
 
 # viz code for account sql
 def _accnt(data):
-    if data == [{'error': 'Error while fetching data'}] or data == [{"data": "Not Found"}]:
+    if (data.columns[0] == 'data') and ( data.columns[1] == "Data Not Found" or data.columns[1] == "Error while fetching data" ):
         return data
     df = pd.DataFrame(data)
     df1 = df[["billing_country", "annual_revenue"]].fillna(0)
-    #df2 = df1.set_index('account_id')
+    # df2 = df1.set_index('account_id')
     df2 = df1.groupby(['billing_country']).sum()
     low = df2.min()
     high = df2.max()
-    #df_viz_pie = df2.plot.pie(y='annual_revenue', figsize=(10, 5), ylabel='', fontsize=12, autopct=lambda x: f'{round(x * df2.sum()[0] / 100)}' if x != 0 else '')
-    df_viz_bar = df2.plot.bar(y=0, ylabel='account_revenue', figsize=(10, 5), ylim=[0, math.ceil(high + 0.2 * (high - low))])
-    #df_viz_pie.set_title('Revenue', fontsize=20)
+    # df_viz_pie = df2.plot.pie(y='annual_revenue', figsize=(10, 5), ylabel='', fontsize=12, autopct=lambda x: f'{round(x * df2.sum()[0] / 100)}' if x != 0 else '')
+    df_viz_bar = df2.plot.bar(y=0, ylabel='account_revenue', figsize=(10, 5),
+                              ylim=[0, math.ceil(high + 0.2 * (high - low))])
+    # df_viz_pie.set_title('Revenue', fontsize=20)
     df_viz_bar.set_title('Revenue', fontsize=20)
     # df_figure_pie = df_viz_pie.legend(df1['account_id'], bbox_to_anchor=(1.1, 1), loc="best").get_figure()
     # df_figure_bar = df_viz_bar.legend(df1['account_id'], bbox_to_anchor=(1.1, 1), loc="best").get_figure()
-    #df_viz_bar.legend(df1['billing_country'], bbox_to_anchor=(1.1, 1), loc="best")
+    # df_viz_bar.legend(df1['billing_country'], bbox_to_anchor=(1.1, 1), loc="best")
     # bar_file = f'{generate_name(config.project_temp)}.jpg'
     # df_figure_pie.savefig(f'{config.project_home}/temp/pie.jpg', bbox_inches='tight')
     # df_figure_bar.savefig(f'{bar_file}', bbox_inches='tight')
@@ -66,7 +67,7 @@ def _accnt(data):
 
 
 def _leadmngmnt(data):
-    if data == [{'error': 'Error while fetching data'}] or data == [{"data": "Not Found"}]:
+    if (data.columns[0] == 'data') and ( data.columns[1] == "Data Not Found" or data.columns[1] == "Error while fetching data" ):
         return data
     df = pd.DataFrame(data)
     df = df[['super_region', 'lead_id']]
@@ -91,14 +92,14 @@ def generate_charts(sql_file_list):
     for i in sql_file_list:
         viz_func = '_' + i.replace('-', '_').split('.')[0]
         if viz_func in l_functions:
-            created_file.append(eval(viz_func)(fetch_data.fetch_data(i.split('.')[0], sql_limit=None)))
+            created_file.append(eval(viz_func)(fetch_data.fetch_data(i.split('.')[0], sql_args=' where 1=1 ')))
             # created_file.append(_accnt(fetch_data.fetch_data(i.split('.')[0])))
     not_aFile = False
     if len(created_file) > 1:
         zip_file = f'{generate_name(config.project_temp)}.zip'.split('/')[-1]
         with zipfile.ZipFile(f'{config.project_temp}/{zip_file}', 'w') as zm:
             for file in created_file:
-                if file is not None and os.path.isfile(str(file)) == True and file is not list:
+                if file is not None and os.path.isfile(str(file)) and file is not list:
                     zm.write(file, compress_type=zipfile.ZIP_DEFLATED, arcname=file.split('/')[-1])
                 else:
                     not_aFile = True
