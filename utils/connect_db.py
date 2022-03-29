@@ -17,7 +17,7 @@ def execute_sql(query, sql_args):
     if conn is not None:
         cur = conn.cursor()
         try:
-            #cur.execute('Select * from ( ' + query + ' ) as AaZz ' + sql_args)
+            cur.execute('Select * from ( ' + query + ' ) as AaZz ' + sql_args)
             #cur.execute(query)
             cols = [desc[0] for desc in cur.description]
             rows = cur.fetchall()
