@@ -19,10 +19,10 @@ sql_parser.add_argument('per_page', type=int, help="Per Page limit")
 # custom_sql_args = reqparse.RequestParser()
 # custom_sql_args.add_argument("sql", type=str, help="Send SQL Query", required=True)
 
-def get_paginated_list(tablename, sql_args, url, start, per_page=10):
+def get_paginated_list(tablename, sql_filter, sql_limit, url, start, per_page=10):
     start = int(start)
     per_page = int(per_page)
-    results = fetch_data(tablename, sql_args)
+    results = fetch_data(tablename, sql_filter + sql_limit)
     count = len(results)
     if count < start or per_page < 0:
         flask.abort(404)
@@ -77,9 +77,10 @@ def fetchdata_apps(tablename):
         sql_arg['per_page'] = 10
     if sql_arg['per_page'] is None:
         sql_arg['per_page'] = 10
-    #df = fetch_data(tablename, sql_filter + sql_limit)
+    #df = fetch_data(tablename, sql_filter, sql_limit)
+    #return flask.jsonify(json.loads(df.to_json(orient='records')))
     return flask.jsonify(get_paginated_list(
-        tablename, sql_filter + sql_limit,
+        tablename, sql_filter, sql_limit,
         request.url_root + 'fetch_apps/' + tablename,
         start=request.args.get('start', 1),
         per_page=request.args.get('per_page', sql_arg['per_page'])))
